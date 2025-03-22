@@ -31,4 +31,13 @@ public class Tile
         _owner = owner;
         _resources = resources;
     }
+
+    public Biome GetBiome() { return _biome; }
+    public Terrain GetTerrain() { return _terrain; }
+    public Owner GetOwner() { return _owner; }
+    public Dictionary<Resource, int> GetResources() { return _resources; }
+    public BuildingProgress GetBuiltBuilding() { return _builtBuilding; }
+    public bool IsAccessible() { return _accessible; }
+
+
 }

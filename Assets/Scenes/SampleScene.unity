@@ -320,7 +320,7 @@ GameObject:
   - component: {fileID: 1856947770}
   - component: {fileID: 1856947772}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -365,6 +365,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63714fb204814fd478b5b8c357b36697, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tilePlain: {fileID: 8270908133647609054, guid: 4d949705a24c1a94e9b54ffb40635637, type: 3}
+  tileLake: {fileID: 2966337844796493858, guid: f8ead12c077cfb34ca31ad6bd07fb9af, type: 3}
+  tileDesert: {fileID: 355052700933777111, guid: 74638c6e52fdcde45b0f9813e2e79940, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -11,10 +11,26 @@ public class RestAPI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(GetMap(new Vector2Int(0, 10), new Vector2Int(0, 10)));
     }
 
-    IEnumerator GetMap(Vector2Int x, Vector2Int y)
+    public IEnumerator CastAction(string idVillager, string action, string reference = null)
+    {
+        string uri = URL + $"/equipes/{Config.GetId_Team()}/villageois/{idVillager}/demander-action";
+        UnityWebRequest request = new UnityWebRequest(uri, "POST");
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Authorization", "Bearer " + Config.GetToken());
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.ConnectionError)
+        {
+            Debug.LogError(request.error);
+        } else
+        {
+
+        }
+    }
+
+    public IEnumerator GetMap(Vector2Int x, Vector2Int y)
     {
         string uri = URL + $"/monde/map?x_range={x.x},{x.y}&y_range={y.x},{y.y}";
         UnityWebRequest request = new UnityWebRequest(uri, "GET");
@@ -88,26 +104,17 @@ public class RestAPI : MonoBehaviour
                     Owner buildingOwner = new Owner(jsonBuildingOwner["idEquipe"], jsonBuildingOwner["nom"], jsonBuildingOwner["type"]);
 
                     BuildingProgress building = new BuildingProgress(jsonBuild["progression"], jsonBuild["identifiant"], buildingOwner, _buildProgress);
-                    MapManager.Instance.Map[position.x, position.y] = new Tile(position, building, accessible, biome, terrain, owner, Utility.ConstructResourceDictNoID(jsonResources));
+                    if(position.x >= 0 && position.x < 33 && position.y >= 0 && position.y < 33)
+                        MapManager.Instance.Map[position.x, position.y] = new Tile(position, building, accessible, biome, terrain, owner, Utility.ConstructResourceDictNoID(jsonResources));
                 }
 
-                MapManager.Instance.Map[position.x, position.y] = new Tile(position, accessible, biome, terrain, owner, Utility.ConstructResourceDictNoID(jsonResources));
-            }
-
-
-            Debug.Log(map?.ToString());
-            for (int i = x.x; i < x.y; i++)
-            {
-                for (int j = y.x; j < y.y; j++)
-                {
-                    //MapManager.Instance.map[i, j] 
-                }
+                if (position.x >= 0 && position.x < 33 && position.y >= 0 && position.y < 33)
+                    MapManager.Instance.Map[position.x, position.y] = new Tile(position, accessible, biome, terrain, owner, Utility.ConstructResourceDictNoID(jsonResources));
             }
         }
     }
 
-
-    IEnumerator GetTeam()
+    public IEnumerator GetTeam()
     {
         // http://51.210.117.22:8080/equipes/f77e66d4-be12-4249-bab0-02701e3b0853
         string uri = URL + $"/equipes/{Config.GetId_Team()}";
@@ -123,15 +130,30 @@ public class RestAPI : MonoBehaviour
         else
         {
             string json = request?.downloadHandler.text;
-            SimpleJSON.JSONNode map = SimpleJSON.JSON.Parse(json);
+            JSONNode team = JSON.Parse(json);
 
-            Debug.Log(map?.ToString());
+            Debug.Log(team?.ToString());
             // REcuperation des données
+            Dictionary<Resource, int> resources = Utility.ConstructResourceDictNoID(team["ressources"]);
+
+            JSONNode jsonVillagers = team["villageois"];
+            List<Villager> villagers = new List<Villager>();
+
+            foreach(JSONNode jsonVillager in jsonVillagers)
+            {
+                JSONNode jsonVillagerType = jsonVillager["type"];
+                VillagerType villagerType = new VillagerType(jsonVillagerType["nom"], jsonVillagerType["description"], 
+                    jsonVillagerType["mutliplicateurDeCooldown"]);
+
+                villagers.Add(new Villager(jsonVillager["idVillageois"], jsonVillager["nom"], 
+                    jsonVillager["dateDerniereAction"], jsonVillager["disponible"],
+                    villagerType, new Vector2Int(jsonVillager["positionX"], jsonVillager["positionY"])));
+            }
 
         }
     }
 
-    IEnumerator GetBatiments()
+    public IEnumerator GetBatiments()
     {
         // http://51.210.117.22:8080/batiments
         string uri = URL + $"/batiments";
@@ -147,15 +169,29 @@ public class RestAPI : MonoBehaviour
         else
         {
             string json = request?.downloadHandler.text;
-            SimpleJSON.JSONNode map = SimpleJSON.JSON.Parse(json);
+            SimpleJSON.JSONNode building = SimpleJSON.JSON.Parse(json);
 
-            Debug.Log(map?.ToString());
+            Debug.Log(building?.ToString());
             // REcuperation des données
-
+            List<Building> buildings = new List<Building>();
+            foreach (JSONNode b in building)
+            {
+                JSONNode jsonBiomes = b["contructibleSur"];
+                List<Biome> biomes = new List<Biome>();
+                foreach (JSONNode jsonBiome in jsonBiomes)
+                {
+                    Biome biome = new Biome(jsonBiome["id"], jsonBiome["name"], jsonBiome["description"]);
+                    biomes.Add(biome);
+                }
+                Building tempBuilding = new Building(b["id"], b["description"], b["type"], b["tempsConstruction"], b["estUneMerveille"],
+                biomes, Utility.ConstructResourceDict(b["coutParTour"]), Utility.ConstructResourceDict(b["coutConstruction"]), Utility.ConstructResourceDict(b["bonusConstruction"]),
+                Utility.ConstructResourceDict(b["bonus"]));
+                buildings.Add(tempBuilding);
+            }
         }
     }
 
-    IEnumerator GetBatimentsDispo()
+    public IEnumerator GetBatimentsDispo()
     {
         // http://51.210.117.22:8080/batiments/disponible
         string uri = URL + $"/batiments/disponible";
@@ -171,15 +207,29 @@ public class RestAPI : MonoBehaviour
         else
         {
             string json = request?.downloadHandler.text;
-            SimpleJSON.JSONNode map = SimpleJSON.JSON.Parse(json);
+            JSONNode building = JSON.Parse(json);
 
-            Debug.Log(map?.ToString());
+            Debug.Log(building?.ToString());
             // REcuperation des données
-
+            List<Building> buildings = new List<Building>();
+            foreach (JSONNode b in building)
+            {
+                JSONNode jsonBiomes = b["contructibleSur"];
+                List<Biome> biomes = new List<Biome>();
+                foreach (JSONNode jsonBiome in jsonBiomes)
+                {
+                    Biome biome = new Biome(jsonBiome["id"], jsonBiome["name"], jsonBiome["description"]);
+                    biomes.Add(biome);
+                }
+                Building tempBuilding = new Building(b["id"], b["description"], b["type"], b["tempsConstruction"], b["estUneMerveille"],
+                biomes, Utility.ConstructResourceDict(b["coutParTour"]), Utility.ConstructResourceDict(b["coutConstruction"]), Utility.ConstructResourceDict(b["bonusConstruction"]),
+                Utility.ConstructResourceDict(b["bonus"]));
+                buildings.Add(tempBuilding);
+            }
         }
     }
 
-    IEnumerator GetBatimentsWithIdBatiment(string id_batiment)
+    public IEnumerator GetBatimentsWithIdBatiment(string id_batiment)
     {
         // http://51.210.117.22:8080/batiments/{idBatiment}
         string uri = URL + $"/batiments/{id_batiment}";
@@ -195,15 +245,24 @@ public class RestAPI : MonoBehaviour
         else
         {
             string json = request?.downloadHandler.text;
-            SimpleJSON.JSONNode map = SimpleJSON.JSON.Parse(json);
+            JSONNode building = JSON.Parse(json);
 
-            Debug.Log(map?.ToString());
+            Debug.Log(building?.ToString());
             // REcuperation des données
-
+            JSONNode jsonBiomes = building["contructibleSur"];
+            List<Biome> biomes = new List<Biome>();
+            foreach (JSONNode jsonBiome in jsonBiomes)
+            {
+                Biome biome = new Biome(jsonBiome["id"], jsonBiome["name"], jsonBiome["description"]);
+                biomes.Add(biome);
+            }
+            Building tempBuilding = new Building(building["id"], building["description"], building["type"], building["tempsConstruction"], building["estUneMerveille"],
+            biomes, Utility.ConstructResourceDict(building["coutParTour"]), Utility.ConstructResourceDict(building["coutConstruction"]), Utility.ConstructResourceDict(building["bonusConstruction"]),
+            Utility.ConstructResourceDict(building["bonus"]));
         }
     }
 
-    IEnumerator getTeamNpcWithIdEquipe()
+    public IEnumerator getTeamNpcWithIdEquipe()
     {
         // http://51.210.117.22:8080/equipes/{idEquipe}/villageois
         string uri = URL + $"/equipes/{Config.GetId_Team()}/villageois";
@@ -219,15 +278,26 @@ public class RestAPI : MonoBehaviour
         else
         {
             string json = request?.downloadHandler.text;
-            SimpleJSON.JSONNode map = SimpleJSON.JSON.Parse(json);
+            JSONNode jsonVillagers = JSON.Parse(json);
 
-            Debug.Log(map?.ToString());
+            Debug.Log(jsonVillagers?.ToString());
             // REcuperation des données
+            List<Villager> villagers = new List<Villager>();
 
+            foreach (JSONNode jsonVillager in jsonVillagers)
+            {
+                JSONNode jsonVillagerType = jsonVillager["type"];
+                VillagerType villagerType = new VillagerType(jsonVillagerType["nom"], jsonVillagerType["description"],
+                    jsonVillagerType["mutliplicateurDeCooldown"]);
+
+                villagers.Add(new Villager(jsonVillager["idVillageois"], jsonVillager["nom"],
+                    jsonVillager["dateDerniereAction"], jsonVillager["disponible"],
+                    villagerType, new Vector2Int(jsonVillager["positionX"], jsonVillager["positionY"])));
+            }
         }
     }
 
-    IEnumerator getTeamNpcWithIdEquipeAndIdPnj(string id_villageois)
+    public IEnumerator getTeamNpcWithIdEquipeAndIdPnj(string id_villageois)
     {
         // http://51.210.117.22:8080/equipes/{idEquipe}/villageois/{idVillageois}
         string uri = URL + $"/equipes/{Config.GetId_Team()}/villageois/{id_villageois}";
@@ -243,15 +313,25 @@ public class RestAPI : MonoBehaviour
         else
         {
             string json = request?.downloadHandler.text;
-            SimpleJSON.JSONNode map = SimpleJSON.JSON.Parse(json);
+            SimpleJSON.JSONNode jsonVillager = SimpleJSON.JSON.Parse(json);
 
-            Debug.Log(map?.ToString());
+            Debug.Log(jsonVillager?.ToString());
             // REcuperation des données
+
+            JSONNode jsonVillagers = jsonVillager["Villageois"];
+
+            JSONNode jsonVillagerType = jsonVillagers["type"];
+            VillagerType villagerType = new VillagerType(jsonVillagerType["nom"],
+                jsonVillagers["description"], jsonVillagers["mutliplicateurDeCooldown"]);
+
+            Villager villager = new Villager(jsonVillagers["idVillageois"], jsonVillagers["nom"],
+                jsonVillagers["dateDerniereAction"], jsonVillagers["disponible"],
+                villagerType, new Vector2Int(jsonVillagers["positionX"], jsonVillagers["positionY"]));
 
         }
     }
 
-    IEnumerator getRessources()
+    public IEnumerator getRessources()
     {
         // http://51.210.117.22:8080/ressources
         string uri = URL + $"/ressources";
@@ -267,11 +347,19 @@ public class RestAPI : MonoBehaviour
         else
         {
             string json = request?.downloadHandler.text;
-            SimpleJSON.JSONNode map = SimpleJSON.JSON.Parse(json);
+            JSONNode rsc = JSON.Parse(json);
 
-            Debug.Log(map?.ToString());
+            Debug.Log(rsc?.ToString());
             // REcuperation des données
 
+            JSONNode jsonResources = rsc["Ressource"];
+            List<Resource> ressource = new List<Resource>();
+
+            foreach (JSONNode jsonResource in jsonResources)
+            {
+                ressource.Add(new Resource(jsonResource["idRessource"], jsonResource["description"],
+                    jsonResource["nom"], jsonResource["type"]));
+            }
         }
     }
 

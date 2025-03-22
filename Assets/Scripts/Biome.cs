@@ -14,4 +14,6 @@ public class Biome
         _name = name;
         _description = description;
     }
+
+    public string GetName() { return _name; }
 }
