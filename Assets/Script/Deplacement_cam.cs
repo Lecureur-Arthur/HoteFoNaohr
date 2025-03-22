@@ -7,8 +7,6 @@ public class Deplacement_cam : MonoBehaviour
     public Transform target;
     
     public Vector3 offset;
-
-    public GameObject player;
     
     void Start()
     {

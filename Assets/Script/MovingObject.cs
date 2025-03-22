@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class MovingObject : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+     public float speed = 5f;
 
-    // Update is called once per frame
     void Update()
     {
-        
+         float moveX = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
+        float moveZ = Input.GetAxis("Vertical") * speed * Time.deltaTime;
+
+        transform.Translate(new Vector3(moveX, 0, moveZ));
     }
 }
