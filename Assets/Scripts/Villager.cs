@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class Villager : MonoBehaviour
+public class Villager
 {
     private string _id = "";
     private string _name = "";
@@ -10,4 +10,13 @@ public class Villager : MonoBehaviour
     private VillagerType _type;
     private Vector2 _position;
 
+    public Villager(string id, string name, string lastActionDate, bool available, VillagerType type, Vector2 position)
+    {
+        _id = id;
+        _name = name;
+        _lastActionDate = lastActionDate;
+        _available = available;
+        _type = type;
+        _position = position;
+    }
 }
