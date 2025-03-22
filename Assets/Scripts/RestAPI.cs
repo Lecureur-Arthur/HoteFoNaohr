@@ -2,15 +2,21 @@ using SimpleJSON;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 
 public class RestAPI : MonoBehaviour
 {
+    public UnityEvent mapReady = new UnityEvent();
     private string URL = "http://51.210.117.22:8080";
 
     // Start is called before the first frame update
     void Start()
     {
+        if (mapReady == null)
+            mapReady = new UnityEvent();
+
+        mapReady.AddListener(MapManager.Instance.GenerateMap);
     }
 
     public IEnumerator CastAction(string idVillager, string action, string reference = null)
@@ -44,73 +50,78 @@ public class RestAPI : MonoBehaviour
         }
         else
         {
-            Debug.Log(request?.downloadHandler.ToString());
             string json = request?.downloadHandler.text;
             JSONNode map = JSON.Parse(json);
 
             foreach(JSONNode tile in map)
             {
                 Vector2Int position = new Vector2Int(tile["coord_x"], tile["coord_y"]);
-
-                JSONNode jsonBiome = tile["biome"];
-                JSONNode jsonTerrain = tile["terrain"];
-                JSONNode jsonOwner = tile["proprietaire"];
-                JSONNode jsonBiomeAllowedBuildings = jsonBiome["batimentsContructible"];
-                List<Building> buildings = new List<Building>();
-                foreach(JSONNode _building in jsonBiomeAllowedBuildings)
-                {
-
-                    JSONNode _buildableOn = _building["contructibleSur"];
-                    List<Biome> _buildableOnList = new List<Biome>();
-                    foreach(JSONNode _biome in _buildableOn)
-                    {
-                        Biome b = new Biome(_biome["identifiant"], _biome["nom"], _biome["description"]);
-                        _buildableOnList.Add(b);
-                    }
-
-                    buildings.Add(new Building(_building["id"], _building["description"], _building["type"], _building["tempsConstruction"],
-                        _building["estUneMerveille"], _buildableOnList, Utility.ConstructResourceDict(_building["coutParTour"]), 
-                        Utility.ConstructResourceDict(_building["coutConstruction"]), Utility.ConstructResourceDict(_building["bonusConstruction"]),
-                        Utility.ConstructResourceDict(_building["bonus"])));
-                }
-
-
-                Biome biome = new Biome(jsonBiome["identifiant"], jsonBiome["nom"], jsonBiome["description"]);
-
-                Terrain terrain = new Terrain(jsonTerrain["identifiant"], jsonTerrain["nom"], jsonTerrain["description"], Utility.ConstructResourceDictNoID(jsonTerrain["ressourcesPresente"]));
-                Owner owner = new Owner(jsonOwner["idEquipe"], jsonOwner["nom"], jsonOwner["type"]);
-
-                JSONNode jsonBuild = tile["batiment_construit"];
-                JSONNode jsonBuilding = jsonBuild["detailBatiment"];
-                JSONNode jsonBuildingOwner = jsonBuild["proprietaire"];
-                bool accessible = tile["accessible"];
-                JSONNode jsonResources = tile["resources"];
-
-                if (jsonBuild != null)
-                {
-                    JSONNode _pBuildableOn = jsonBuilding["contructibleSur"];
-                    List<Biome> _pBuildableOnList = new List<Biome>();
-                    foreach (JSONNode _biome in _pBuildableOn)
-                    {
-                        Biome b = new Biome(_biome["identifiant"], _biome["nom"], _biome["description"]);
-                        _pBuildableOnList.Add(b);
-                    }
-                    Building _buildProgress = new Building(jsonBuilding["id"], jsonBuilding["description"], jsonBuilding["type"], jsonBuilding["tempsConstruction"],
-                            jsonBuilding["estUneMerveille"], _pBuildableOnList, Utility.ConstructResourceDict(jsonBuilding["coutParTour"]),
-                            Utility.ConstructResourceDict(jsonBuilding["coutConstruction"]), Utility.ConstructResourceDict(jsonBuilding["bonusConstruction"]),
-                            Utility.ConstructResourceDict(jsonBuilding["bonus"]));
-
-
-                    Owner buildingOwner = new Owner(jsonBuildingOwner["idEquipe"], jsonBuildingOwner["nom"], jsonBuildingOwner["type"]);
-
-                    BuildingProgress building = new BuildingProgress(jsonBuild["progression"], jsonBuild["identifiant"], buildingOwner, _buildProgress);
-                    if(position.x >= 0 && position.x < 33 && position.y >= 0 && position.y < 33)
-                        MapManager.Instance.Map[position.x, position.y] = new Tile(position, building, accessible, biome, terrain, owner, Utility.ConstructResourceDictNoID(jsonResources));
-                }
-
+                
                 if (position.x >= 0 && position.x < 33 && position.y >= 0 && position.y < 33)
+                {
+                    JSONNode jsonBiome = tile["biome"];
+                    JSONNode jsonTerrain = tile["terrain"];
+                    JSONNode jsonOwner = tile["proprietaire"];
+                    JSONNode jsonBiomeAllowedBuildings = jsonBiome["batimentsContructible"];
+
+
+                    List<Building> buildings = new List<Building>();
+                    foreach (JSONNode _building in jsonBiomeAllowedBuildings)
+                    {
+
+                        JSONNode _buildableOn = _building["contructibleSur"];
+                        List<Biome> _buildableOnList = new List<Biome>();
+                        foreach (JSONNode _biome in _buildableOn)
+                        {
+                            Biome b = new Biome(_biome["identifiant"], _biome["nom"], _biome["description"]);
+                            _buildableOnList.Add(b);
+                        }
+
+                        buildings.Add(new Building(_building["id"], _building["description"], _building["type"], _building["tempsConstruction"],
+                            _building["estUneMerveille"], _buildableOnList, Utility.ConstructResourceDict(_building["coutParTour"]),
+                            Utility.ConstructResourceDict(_building["coutConstruction"]), Utility.ConstructResourceDict(_building["bonusConstruction"]),
+                            Utility.ConstructResourceDict(_building["bonus"])));
+                    }
+
+
+                    Biome biome = new Biome(jsonBiome["identifiant"], jsonBiome["nom"], jsonBiome["description"]);
+
+                    Terrain terrain = new Terrain(jsonTerrain["identifiant"], jsonTerrain["nom"], jsonTerrain["description"], Utility.ConstructResourceDictNoID(jsonTerrain["ressourcesPresente"]));
+                    Owner owner = new Owner(jsonOwner["idEquipe"], jsonOwner["nom"], jsonOwner["type"]);
+
+                    JSONNode jsonBuild = tile["batiment_construit"];
+                    JSONNode jsonBuilding = jsonBuild["detailBatiment"];
+                    JSONNode jsonBuildingOwner = jsonBuild["proprietaire"];
+                    bool accessible = tile["accessible"];
+                    JSONNode jsonResources = tile["resources"];
+
+                    if (jsonBuild != null)
+                    {
+                        JSONNode _pBuildableOn = jsonBuilding["contructibleSur"];
+                        List<Biome> _pBuildableOnList = new List<Biome>();
+                        foreach (JSONNode _biome in _pBuildableOn)
+                        {
+                            Biome b = new Biome(_biome["identifiant"], _biome["nom"], _biome["description"]);
+                            _pBuildableOnList.Add(b);
+                        }
+                        Building _buildProgress = new Building(jsonBuilding["id"], jsonBuilding["description"], jsonBuilding["type"], jsonBuilding["tempsConstruction"],
+                                jsonBuilding["estUneMerveille"], _pBuildableOnList, Utility.ConstructResourceDict(jsonBuilding["coutParTour"]),
+                                Utility.ConstructResourceDict(jsonBuilding["coutConstruction"]), Utility.ConstructResourceDict(jsonBuilding["bonusConstruction"]),
+                                Utility.ConstructResourceDict(jsonBuilding["bonus"]));
+
+
+                        Owner buildingOwner = new Owner(jsonBuildingOwner["idEquipe"], jsonBuildingOwner["nom"], jsonBuildingOwner["type"]);
+
+                        BuildingProgress building = new BuildingProgress(jsonBuild["progression"], jsonBuild["identifiant"], buildingOwner, _buildProgress);
+
+
+                        MapManager.Instance.Map[position.x, position.y] = new Tile(position, building, accessible, biome, terrain, owner, Utility.ConstructResourceDictNoID(jsonResources));
+                    }
+
                     MapManager.Instance.Map[position.x, position.y] = new Tile(position, accessible, biome, terrain, owner, Utility.ConstructResourceDictNoID(jsonResources));
+                }
             }
+            mapReady?.Invoke();
         }
     }
 

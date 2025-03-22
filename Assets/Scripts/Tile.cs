@@ -4,7 +4,7 @@ using UnityEngine;
 public class Tile
 {
     // X and Y
-    private Vector2 _coordinates = new Vector2(0, 0);
+    private Vector2Int _coordinates = new Vector2Int(0, 0);
     private BuildingProgress _builtBuilding = null;
     private bool _accessible = false;
     private Biome _biome;
@@ -12,7 +12,7 @@ public class Tile
     private Owner _owner;
     private Dictionary<Resource, int> _resources = new Dictionary<Resource, int>();
 
-    public Tile (Vector2 coordinates, BuildingProgress builtBuilding, bool accessible, Biome biome, Terrain terrain, Owner owner, Dictionary<Resource, int> resources)
+    public Tile (Vector2Int coordinates, BuildingProgress builtBuilding, bool accessible, Biome biome, Terrain terrain, Owner owner, Dictionary<Resource, int> resources)
     {
         _coordinates = coordinates;
         _builtBuilding = builtBuilding;
@@ -22,7 +22,7 @@ public class Tile
         _owner = owner;
         _resources = resources;
     }
-    public Tile(Vector2 coordinates, bool accessible, Biome biome, Terrain terrain, Owner owner, Dictionary<Resource, int> resources)
+    public Tile(Vector2Int coordinates, bool accessible, Biome biome, Terrain terrain, Owner owner, Dictionary<Resource, int> resources)
     {
         _coordinates = coordinates;
         _accessible = accessible;
@@ -32,6 +32,7 @@ public class Tile
         _resources = resources;
     }
 
+    public Vector2Int GetCoordinates() { return _coordinates; }
     public Biome GetBiome() { return _biome; }
     public Terrain GetTerrain() { return _terrain; }
     public Owner GetOwner() { return _owner; }

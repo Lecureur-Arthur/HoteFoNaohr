@@ -17,4 +17,9 @@ public class Terrain
         _description = description;
         _availableResources = availableResources;
     }
+
+    public string GetName()
+    {
+        return _name;
+    }
 }

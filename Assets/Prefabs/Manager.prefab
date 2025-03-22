@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6819059096074906651
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3109236316285979717}
+  - component: {fileID: 379848137916926297}
+  - component: {fileID: 7733444793316955227}
+  m_Layer: 0
+  m_Name: Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3109236316285979717
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6819059096074906651}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &379848137916926297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6819059096074906651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63714fb204814fd478b5b8c357b36697, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tilePlain: {fileID: 8270908133647609054, guid: 4d949705a24c1a94e9b54ffb40635637, type: 3}
+  tileLake: {fileID: 2966337844796493858, guid: f8ead12c077cfb34ca31ad6bd07fb9af, type: 3}
+  tileDesert: {fileID: 355052700933777111, guid: 74638c6e52fdcde45b0f9813e2e79940, type: 3}
+  grove: {fileID: -8858750985916892607, guid: 9566b8d1998c06f4abe53b5dcf0c64be, type: 3}
+  desertGrove: {fileID: -8858750985916892607, guid: efe6282ede33fb04fb68c1a553f16726, type: 3}
+  forest: {fileID: -8858750985916892607, guid: af7d0f1e42008c9479b3399307439d83, type: 3}
+  desertForest: {fileID: -8858750985916892607, guid: bb5828d3413d5964fa287539a4bc9bb0, type: 3}
+  littleWood: {fileID: -8858750985916892607, guid: 03b5cc012d2f88f41b0b0f95b444236e, type: 3}
+  desertLittleWood: {fileID: -8858750985916892607, guid: c28941725dc4206449ae21a1678fd465, type: 3}
+  coalDeposit: {fileID: -8858750985916892607, guid: 787dcc08a646aba4b92acf8e92f4f628, type: 3}
+  oreDeposit: {fileID: -8858750985916892607, guid: 420fd9ee5dc207d45b47c0fbe22cd099, type: 3}
+  rocks: {fileID: -8858750985916892607, guid: ab375b0cb72012a4e9fd854aa6ec74ff, type: 3}
+  fish: {fileID: -8858750985916892607, guid: 9a37a73649162bb4ebb03955313dc7de, type: 3}
+  MapObject: {fileID: 0}
+--- !u!114 &7733444793316955227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6819059096074906651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cbb81d7baccd0c458b1319d7f411b94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapReady:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 379848137916926297}
+        m_TargetAssemblyTypeName: MapManager, Assembly-CSharp
+        m_MethodName: GenerateMap
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
