@@ -119,21 +119,21 @@ public class MapManager : MonoBehaviour
         postTimer -= Time.deltaTime;
         getTimer -= Time.deltaTime;
 
-        foreach(Villager villager in Villagers)
+        if (postTimer <= 0)
         {
-            if(villager != null && Map[villager.GetPosition().x, villager.GetPosition().y] != null)
+            foreach (Villager villager in Villagers)
             {
-                Dictionary<Resource, int> resources = Map[villager.GetPosition().x, villager.GetPosition().y].GetResources();
-                if (resources != null)
+                if(villager != null && Map[villager.GetPosition().x, villager.GetPosition().y] != null)
                 {
-                    foreach (Resource resource in resources.Keys)
+                    Dictionary<Resource, int> resources = Map[villager.GetPosition().x, villager.GetPosition().y].GetResources();
+                    if (resources != null)
                     {
-                        if (resources[resource] > 0)
+                        foreach (Resource resource in resources.Keys)
                         {
-                            if (postTimer <= 0)
+                            if (resources[resource] > 0)
                             {
-                                restAPI.CastActionAsync(villager.GetId(), "RECOLTER", resource.GetName());
-                                postTimer = maxPostTimer;
+                                    restAPI.CastActionAsync(villager.GetId(), "RECOLTER", resource.GetName());
+                                    postTimer = maxPostTimer;
                             }
                         }
                     }
