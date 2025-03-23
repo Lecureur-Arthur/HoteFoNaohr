@@ -30,4 +30,5 @@ public class Building
         _bonus = bonus;
         _supplements = supplements;
     }
+    public string GetBuildType() { return _type; }
 }

@@ -339,6 +339,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1232192829 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 379848137916926297, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
+  m_PrefabInstance: {fileID: 9197746012977336074}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63714fb204814fd478b5b8c357b36697, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &9197746012977336074
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -348,9 +359,21 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 379848137916926297, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
+      propertyPath: grove
+      value: 
+      objectReference: {fileID: 5030175074146490616, guid: f3169c200f2036c489dfa8298d3fd93d, type: 3}
+    - target: {fileID: 379848137916926297, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
       propertyPath: MapObject
       value: 
       objectReference: {fileID: 762758269}
+    - target: {fileID: 379848137916926297, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
+      propertyPath: desertGrove
+      value: 
+      objectReference: {fileID: 5338856104126529007, guid: 2394ef66f1cc4234c9c6eb187e01fa8d, type: 3}
+    - target: {fileID: 379848137916926297, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
+      propertyPath: desertForest
+      value: 
+      objectReference: {fileID: 5526048786289311562, guid: e46cc0163fe168a45aa5d68463ae6d5b, type: 3}
     - target: {fileID: 3109236316285979717, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -394,6 +417,34 @@ PrefabInstance:
     - target: {fileID: 6819059096074906651, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
       propertyPath: m_Name
       value: Manager
+      objectReference: {fileID: 0}
+    - target: {fileID: 7733444793316955227, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
+      propertyPath: npcReady.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7733444793316955227, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
+      propertyPath: npcReady.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7733444793316955227, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
+      propertyPath: npcReady.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1232192829}
+    - target: {fileID: 7733444793316955227, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
+      propertyPath: npcReady.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7733444793316955227, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
+      propertyPath: npcReady.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: DisplayVillagers
+      objectReference: {fileID: 0}
+    - target: {fileID: 7733444793316955227, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
+      propertyPath: npcReady.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: MapManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7733444793316955227, guid: 6ea29865cb110004a831cdd6d4840b1f, type: 3}
+      propertyPath: npcReady.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

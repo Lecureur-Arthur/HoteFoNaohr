@@ -48,16 +48,48 @@ MonoBehaviour:
   tilePlain: {fileID: 8270908133647609054, guid: 4d949705a24c1a94e9b54ffb40635637, type: 3}
   tileLake: {fileID: 2966337844796493858, guid: f8ead12c077cfb34ca31ad6bd07fb9af, type: 3}
   tileDesert: {fileID: 355052700933777111, guid: 74638c6e52fdcde45b0f9813e2e79940, type: 3}
-  grove: {fileID: -8858750985916892607, guid: 9566b8d1998c06f4abe53b5dcf0c64be, type: 3}
-  desertGrove: {fileID: -8858750985916892607, guid: efe6282ede33fb04fb68c1a553f16726, type: 3}
-  forest: {fileID: -8858750985916892607, guid: af7d0f1e42008c9479b3399307439d83, type: 3}
-  desertForest: {fileID: -8858750985916892607, guid: bb5828d3413d5964fa287539a4bc9bb0, type: 3}
-  littleWood: {fileID: -8858750985916892607, guid: 03b5cc012d2f88f41b0b0f95b444236e, type: 3}
-  desertLittleWood: {fileID: -8858750985916892607, guid: c28941725dc4206449ae21a1678fd465, type: 3}
-  coalDeposit: {fileID: -8858750985916892607, guid: 787dcc08a646aba4b92acf8e92f4f628, type: 3}
-  oreDeposit: {fileID: -8858750985916892607, guid: 420fd9ee5dc207d45b47c0fbe22cd099, type: 3}
-  rocks: {fileID: -8858750985916892607, guid: ab375b0cb72012a4e9fd854aa6ec74ff, type: 3}
-  fish: {fileID: -8858750985916892607, guid: 9a37a73649162bb4ebb03955313dc7de, type: 3}
+  grove: {fileID: 5030175074146490616, guid: f3169c200f2036c489dfa8298d3fd93d, type: 3}
+  desertGrove: {fileID: 5338856104126529007, guid: 2394ef66f1cc4234c9c6eb187e01fa8d, type: 3}
+  forest: {fileID: 883629980867118282, guid: 6307aeb3629b87f44b5731eeb4b7e891, type: 3}
+  desertForest: {fileID: 5526048786289311562, guid: e46cc0163fe168a45aa5d68463ae6d5b, type: 3}
+  littleWood: {fileID: 577157350315977399, guid: 02fdb658f7a4f2643b823fec20a4fdb3, type: 3}
+  desertLittleWood: {fileID: 2798182099176531388, guid: d6936c58bd41f1b4ca1018b60c737575, type: 3}
+  coalDeposit: {fileID: 1994310795757366691, guid: 74d551b519323c24a87de6b9a2206427, type: 3}
+  oreDeposit: {fileID: 504511342456722053, guid: 23c80a2bd8eca3741966e8d28d55e6dd, type: 3}
+  rocks: {fileID: 6984903397968239961, guid: 98b816d2dcb6695428ef727b38942ca7, type: 3}
+  fish: {fileID: 5588867197324724183, guid: faa25779d0d40164f84b79e2f2a4fb99, type: 3}
+  coal_mining_workshop: {fileID: 1091690581100029583, guid: e671675092fc4f24da89c8a7170e66fe, type: 3}
+  stone_cutting_workshop: {fileID: 4658017861438048571, guid: b78a6814ffb7b1740ba9c519076c9bdb, type: 3}
+  ship: {fileID: 5752548058680962966, guid: 116c7d92cdc23f844be24a3bcefccebb, type: 3}
+  library: {fileID: 1605471914587549946, guid: d0483865f11ddc8488409706a2e0caae, type: 3}
+  logging_hut: {fileID: 8945409350908032475, guid: 4b049e2dc9b988e4cba1a3dbeae4862e, type: 3}
+  capitol: {fileID: 134559525175734405, guid: 9d3bd7ae1a167644b8fc0c009593580f, type: 3}
+  quarry: {fileID: 6142067933979487946, guid: a7e37a4169b4a69449142f338aee61c2, type: 3}
+  biomass_plant: {fileID: 1284028470281715548, guid: aac07a1bfd3e9b44cbe8dcf29205f2eb, type: 3}
+  methane_power_plant: {fileID: 4434498009497587371, guid: 44d3be28f52f3b74b91c56e1699aa714, type: 3}
+  coal_power_plant: {fileID: 2852745827497509415, guid: 4817cc712a7913c4ba04e4e8288a7940, type: 3}
+  castle: {fileID: 4409400749570177369, guid: 7cb2d2437dff15c41b7fe7bd38609ee8, type: 3}
+  windMill: {fileID: 2534592677709984018, guid: 528074df71f616640a9cdbf2d239e61d, type: 3}
+  iron_excavator: {fileID: 3692818438014840051, guid: 88dc4cedafabf994fb4c855a266f981d, type: 3}
+  farm: {fileID: 5537850638273706895, guid: 5dd2cd27698f59544812b550db04db77, type: 3}
+  high_library: {fileID: 889114609545614981, guid: 84248e70e7aab4e47838416ce443a063, type: 3}
+  high_statue: {fileID: 7352192812766831689, guid: ca9663b31d0a32c4daad73a38889ad38, type: 3}
+  forest_plant: {fileID: 8860887141967354589, guid: b19141be8c3ad154ea286b042d2a2016, type: 3}
+  coal_mining: {fileID: 2774865227252645333, guid: 07706c0460fa7894db069c87b1065d9f, type: 3}
+  iron_mining: {fileID: 8264982957832437363, guid: d80fa60fa7f32c845b42d1aed7b41160, type: 3}
+  mill: {fileID: 1131702275820881275, guid: 7f65b939daddb5946b9335b716544901, type: 3}
+  museum: {fileID: 4855722493324270284, guid: 36d9abb0e24c1b141a8f8ee02fd25e5e, type: 3}
+  observatory: {fileID: 6633094195284509765, guid: 0a0276c527ef75c448f9e6002d36a2f3, type: 3}
+  port: {fileID: 7625002717648104408, guid: 463ef42b345913d4f9a7dcd1398763f1, type: 3}
+  carbon_well: {fileID: 2929944856387885655, guid: 26c00ad0007956047a79d70b2338ffa7, type: 3}
+  nuclear_fusion_reactor: {fileID: 8822274110126378560, guid: 347383905c627cc49ae1762188146105, type: 3}
+  sawMill: {fileID: 2079788780664555227, guid: da059d73ff04c9241909d56c73345521, type: 3}
+  theater: {fileID: 8168015329275749070, guid: 3472716e78253f54392f1251c658ca2c, type: 3}
+  guet_tower: {fileID: 7596584634105296311, guid: 903e565d734b829409b57ab048a24959, type: 3}
+  hydro_turbine: {fileID: 8690085542788626404, guid: e7e827f870b4a5e44b7b8beed8be4983, type: 3}
+  renewal_plant: {fileID: 6732004053705294651, guid: 1daa9de63bfbbc347b921d204b29a221, type: 3}
+  build_zone: {fileID: 664050058215857334, guid: 650e62480804c0146801bc7f846ecfa5, type: 3}
+  villagerPrefab: {fileID: 3986253116154727268, guid: 153fbb7bacb0d174c814f6018699f383, type: 3}
   MapObject: {fileID: 0}
 --- !u!114 &7733444793316955227
 MonoBehaviour:

@@ -8,9 +8,9 @@ public class Villager
     private string _lastActionDate = "";
     private bool _available = false;
     private VillagerType _type;
-    private Vector2 _position;
+    private Vector2Int _position;
 
-    public Villager(string id, string name, string lastActionDate, bool available, VillagerType type, Vector2 position)
+    public Villager(string id, string name, string lastActionDate, bool available, VillagerType type, Vector2Int position)
     {
         _id = id;
         _name = name;
@@ -19,4 +19,6 @@ public class Villager
         _type = type;
         _position = position;
     }
+
+    public Vector2Int GetPosition() { return _position; }
 }

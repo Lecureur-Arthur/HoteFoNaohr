@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 public class RestAPI : MonoBehaviour
 {
     public UnityEvent mapReady = new UnityEvent();
+    public UnityEvent npcReady = new UnityEvent();
     private string URL = "http://51.210.117.22:8080";
 
     // Start is called before the first frame update
@@ -15,6 +16,9 @@ public class RestAPI : MonoBehaviour
     {
         if (mapReady == null)
             mapReady = new UnityEvent();
+
+        if (npcReady == null)
+            npcReady = new UnityEvent();
 
         mapReady.AddListener(MapManager.Instance.GenerateMap);
     }
@@ -273,7 +277,7 @@ public class RestAPI : MonoBehaviour
         }
     }
 
-    public IEnumerator getTeamNpcWithIdEquipe()
+    public IEnumerator GetTeamNpcWithIdEquipe()
     {
         // http://51.210.117.22:8080/equipes/{idEquipe}/villageois
         string uri = URL + $"/equipes/{Config.GetId_Team()}/villageois";
@@ -295,20 +299,28 @@ public class RestAPI : MonoBehaviour
             // REcuperation des données
             List<Villager> villagers = new List<Villager>();
 
+            Debug.Log(jsonVillagers.Count);
             foreach (JSONNode jsonVillager in jsonVillagers)
             {
+                
                 JSONNode jsonVillagerType = jsonVillager["type"];
-                VillagerType villagerType = new VillagerType(jsonVillagerType["nom"], jsonVillagerType["description"],
-                    jsonVillagerType["mutliplicateurDeCooldown"]);
+                if (jsonVillagerType != null)
+                {
+                    VillagerType villagerType = new VillagerType(jsonVillagerType["nom"], jsonVillagerType["description"],
+                        jsonVillagerType["mutliplicateurDeCooldown"]);
+                    villagers.Add(new Villager(jsonVillager["idVillageois"], jsonVillager["nom"],
+                        jsonVillager["dateDerniereAction"], jsonVillager["disponible"],
+                        villagerType, new Vector2Int(jsonVillager["positionX"], jsonVillager["positionY"])));
+                }
 
-                villagers.Add(new Villager(jsonVillager["idVillageois"], jsonVillager["nom"],
-                    jsonVillager["dateDerniereAction"], jsonVillager["disponible"],
-                    villagerType, new Vector2Int(jsonVillager["positionX"], jsonVillager["positionY"])));
             }
+            Debug.Log(villagers.Count);
+            MapManager.Instance.Villagers = villagers;
+            npcReady.Invoke();
         }
     }
 
-    public IEnumerator getTeamNpcWithIdEquipeAndIdPnj(string id_villageois)
+    public IEnumerator GetTeamNpcWithIdEquipeAndIdPnj(string id_villageois)
     {
         // http://51.210.117.22:8080/equipes/{idEquipe}/villageois/{idVillageois}
         string uri = URL + $"/equipes/{Config.GetId_Team()}/villageois/{id_villageois}";
@@ -335,14 +347,14 @@ public class RestAPI : MonoBehaviour
             VillagerType villagerType = new VillagerType(jsonVillagerType["nom"],
                 jsonVillagers["description"], jsonVillagers["mutliplicateurDeCooldown"]);
 
-            Villager villager = new Villager(jsonVillagers["idVillageois"], jsonVillagers["nom"],
+            MapManager.Instance.VillagerById = new Villager(jsonVillagers["idVillageois"], jsonVillagers["nom"],
                 jsonVillagers["dateDerniereAction"], jsonVillagers["disponible"],
                 villagerType, new Vector2Int(jsonVillagers["positionX"], jsonVillagers["positionY"]));
 
         }
     }
 
-    public IEnumerator getRessources()
+    public IEnumerator GetRessources()
     {
         // http://51.210.117.22:8080/ressources
         string uri = URL + $"/ressources";

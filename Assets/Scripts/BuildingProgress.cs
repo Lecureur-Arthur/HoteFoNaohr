@@ -16,4 +16,8 @@ public class BuildingProgress
         _owner = owner;
         _building = building;
     }
+    public Building GetBuild()
+    {
+        return _building;
+    }
 }
