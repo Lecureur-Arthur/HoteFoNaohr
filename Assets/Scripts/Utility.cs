@@ -10,9 +10,9 @@ public static class Utility
         Dictionary<Resource, int> dict = new Dictionary<Resource, int>();
         foreach (JSONNode res in root)
         {
-            Resource resouce = new Resource(root["idRessource"], root["ressource"]);
+            Resource resource = new Resource(root["idRessource"], root["ressource"]);
             int quantity = root["quantite"];
-            dict.Add(resouce, quantity);
+            dict[resource] = quantity;
         }
 
         return dict;
@@ -23,10 +23,13 @@ public static class Utility
         Dictionary<Resource, int> dict = new Dictionary<Resource, int>();
         foreach (JSONNode res in root)
         {
-            JSONNode jsonRes = root["ressource"];
-            Resource resource = new Resource(jsonRes["idRessource"], jsonRes["nom"], jsonRes["description"]);
-            int quantity = root["quantite"];
-            dict.Add(resource, quantity);
+            foreach(JSONNode jsonRes in root)
+            {
+                JSONNode _jsonRes = jsonRes["ressource"];
+                Resource resource = new Resource(_jsonRes["idRessource"], _jsonRes["nom"], _jsonRes["description"], _jsonRes["type"]);
+                int quantity = jsonRes["quantite"];
+                dict[resource] = quantity;
+            }
         }
 
         return dict;

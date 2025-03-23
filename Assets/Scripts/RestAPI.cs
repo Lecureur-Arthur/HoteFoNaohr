@@ -9,6 +9,7 @@ public class RestAPI : MonoBehaviour
 {
     public UnityEvent mapReady = new UnityEvent();
     public UnityEvent npcReady = new UnityEvent();
+    public UnityEvent uiUpdate = new UnityEvent();
     private string URL = "http://51.210.117.22:8080";
 
     // Start is called before the first frame update
@@ -20,15 +21,37 @@ public class RestAPI : MonoBehaviour
         if (npcReady == null)
             npcReady = new UnityEvent();
 
+        if (uiUpdate == null)
+            uiUpdate = new UnityEvent();
+
         mapReady.AddListener(MapManager.Instance.GenerateMap);
     }
 
     public IEnumerator CastAction(string idVillager, string action, string reference = null)
     {
+        string body = "";
+        if (reference == null)
+        {
+            body = "{\naction:" + action + "\n}";
+        }
+        else
+        {
+            body = "{\naction: " + action + "\nreferece: " + "\n}";
+        }
+
+        
+
         string uri = URL + $"/equipes/{Config.GetId_Team()}/villageois/{idVillager}/demander-action";
         UnityWebRequest request = new UnityWebRequest(uri, "POST");
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Authorization", "Bearer " + Config.GetToken());
+        if (body != null)
+        {
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(body);
+            UploadHandlerRaw upHandler = new UploadHandlerRaw(data);
+            upHandler.contentType = "application/json";
+            request.uploadHandler = upHandler;
+        }
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.ConnectionError)
@@ -40,7 +63,36 @@ public class RestAPI : MonoBehaviour
         }
     }
 
-    public IEnumerator GetMap(Vector2Int x, Vector2Int y)
+    public UnityWebRequestAsyncOperation CastActionAsync(string idVillager, string action, string reference = null)
+    {
+        string body = "";
+        if (reference == null)
+        {
+            body = "{\n\"action\": \"" + action + "\"\n}";
+        }
+        else
+        {
+            body = "{\n\"action\": \"" + action + "\",\n\"reference\": \"" + reference + "\"\n}";
+        }
+
+
+
+        string uri = URL + $"/equipes/{Config.GetId_Team()}/villageois/{idVillager}/demander-action";
+        UnityWebRequest request = new UnityWebRequest(uri, "POST");
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Authorization", "Bearer " + Config.GetToken());
+        if (body != null)
+        {
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(body);
+            UploadHandlerRaw upHandler = new UploadHandlerRaw(data);
+            upHandler.contentType = "application/json";
+            request.uploadHandler = upHandler;
+        }
+
+        return request.SendWebRequest();
+    }
+
+        public IEnumerator GetMap(Vector2Int x, Vector2Int y)
     {
         string uri = URL + $"/monde/map?x_range={x.x},{x.y}&y_range={y.x},{y.y}";
         UnityWebRequest request = new UnityWebRequest(uri, "GET");
@@ -97,7 +149,7 @@ public class RestAPI : MonoBehaviour
                     JSONNode jsonBuilding = jsonBuild["detailBatiment"];
                     JSONNode jsonBuildingOwner = jsonBuild["proprietaire"];
                     bool accessible = tile["accessible"];
-                    JSONNode jsonResources = tile["resources"];
+                    JSONNode jsonResources = tile["ressources"];
 
                     if (jsonBuild != null)
                     {
@@ -147,9 +199,9 @@ public class RestAPI : MonoBehaviour
             string json = request?.downloadHandler.text;
             JSONNode team = JSON.Parse(json);
 
-            Debug.Log(team?.ToString());
             // REcuperation des données
-            Dictionary<Resource, int> resources = Utility.ConstructResourceDictNoID(team["ressources"]);
+            MapManager.Instance.activeResources = Utility.ConstructResourceDictNoID(team["ressources"]);
+            uiUpdate.Invoke();
 
             JSONNode jsonVillagers = team["villageois"];
             List<Villager> villagers = new List<Villager>();
@@ -295,11 +347,9 @@ public class RestAPI : MonoBehaviour
             string json = request?.downloadHandler.text;
             JSONNode jsonVillagers = JSON.Parse(json);
 
-            Debug.Log(jsonVillagers?.ToString());
             // REcuperation des données
             List<Villager> villagers = new List<Villager>();
 
-            Debug.Log(jsonVillagers.Count);
             foreach (JSONNode jsonVillager in jsonVillagers)
             {
                 
@@ -314,7 +364,6 @@ public class RestAPI : MonoBehaviour
                 }
 
             }
-            Debug.Log(villagers.Count);
             MapManager.Instance.Villagers = villagers;
             npcReady.Invoke();
         }
@@ -354,6 +403,16 @@ public class RestAPI : MonoBehaviour
         }
     }
 
+    public UnityWebRequestAsyncOperation GetRessourcesDirect()
+    {
+        string uri = URL + $"/ressources";
+        UnityWebRequest request = new UnityWebRequest(uri, "GET");
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Authorization", "Bearer " + Config.GetToken());
+        return request.SendWebRequest();
+
+    }
+
     public IEnumerator GetRessources()
     {
         // http://51.210.117.22:8080/ressources
@@ -384,6 +443,19 @@ public class RestAPI : MonoBehaviour
                     jsonResource["nom"], jsonResource["type"]));
             }
         }
+    }
+
+    public UnityWebRequestAsyncOperation GetTeamAsync()
+    {
+        // http://51.210.117.22:8080/equipes/f77e66d4-be12-4249-bab0-02701e3b0853
+        string uri = URL + $"/equipes/{Config.GetId_Team()}";
+        UnityWebRequest request = new UnityWebRequest(uri, "GET");
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Authorization", "Bearer " + Config.GetToken());
+
+        //Debug.Log("Sending to the moon my very allergic nemesis");
+
+        return request.SendWebRequest();
     }
 
 }

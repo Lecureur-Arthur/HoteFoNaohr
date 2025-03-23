@@ -1,6 +1,10 @@
+using SimpleJSON;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.Purchasing.MiniJSON;
 using UnityEngine.UIElements;
 
 public class MapManager : MonoBehaviour
@@ -58,6 +62,16 @@ public class MapManager : MonoBehaviour
     [Header("NPC")]
     public GameObject villagerPrefab;
 
+    [Header("UI")]
+    public TextMeshProUGUI woodValue;
+    public TextMeshProUGUI coalValue;
+    public TextMeshProUGUI ironValue;
+    public TextMeshProUGUI foodValue;
+    public TextMeshProUGUI rockValue;
+    public TextMeshProUGUI pollutionValue;
+    public TextMeshProUGUI energieValue;
+
+
     [Header("Misc")]
     public GameObject MapObject;
     public float maxPostTimer = 12.5f;
@@ -70,6 +84,9 @@ public class MapManager : MonoBehaviour
 
     public List<Villager> Villagers;
     public Villager VillagerById;
+    public GameObject pointValue;
+
+    public Dictionary<Resource, int> activeResources = new Dictionary<Resource, int>();
 
     private float _tileWidth = 7f;
     public Tile[,] Map = new Tile[33, 33];
@@ -101,6 +118,63 @@ public class MapManager : MonoBehaviour
     {
         postTimer -= Time.deltaTime;
         getTimer -= Time.deltaTime;
+
+        foreach(Villager villager in Villagers)
+        {
+            if(villager != null && Map[villager.GetPosition().x, villager.GetPosition().y] != null)
+            {
+                Dictionary<Resource, int> resources = Map[villager.GetPosition().x, villager.GetPosition().y].GetResources();
+                if (resources != null)
+                {
+                    foreach (Resource resource in resources.Keys)
+                    {
+                        if (resources[resource] > 0)
+                        {
+                            if (postTimer <= 0)
+                            {
+                                restAPI.CastActionAsync(villager.GetId(), "RECOLTER", resource.GetName());
+                                postTimer = maxPostTimer;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (getTimer <= 0)
+        {
+            StartCoroutine(restAPI.GetTeam());
+            getTimer = maxGetTimer;
+        }
+
+    }
+
+
+    public void UpdateUI()
+    {
+        foreach(Resource res in activeResources.Keys)
+        {
+            Debug.Log(activeResources[res].ToString());
+            switch(res.GetName())
+            {
+                case "BOIS":
+                    woodValue.text = activeResources[res].ToString();
+                    break;
+                case "FER":
+                    ironValue.text = activeResources[res].ToString();
+                    break;
+                case "PIERRE":
+                    rockValue.text = activeResources[res].ToString();
+                    break;
+                case "CHARBON":
+                    coalValue.text = activeResources[res].ToString();
+                    break;
+                case "NOURRITURE":
+                    foodValue.text = activeResources[res].ToString();
+                    break;
+            }
+        }
+
     }
 
     public void GenerateMap()
@@ -111,7 +185,8 @@ public class MapManager : MonoBehaviour
             {
                 Vector2Int pos = tile.GetCoordinates() * 7;
                 Vector3 worldPos = new Vector3(pos.x, 0, pos.y);
-                TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y] = new GameObject("Tile");
+                if(TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y] == null)
+                    TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y] = new GameObject("Tile");
                 TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform.SetParent(MapObject.transform, false);
 
                 GameObject biome = new GameObject("Biome");
@@ -130,7 +205,10 @@ public class MapManager : MonoBehaviour
                         biome = Instantiate(tileDesert, worldPos + tileDesert.transform.position, Quaternion.identity);
                         break;
                 }
-                biome.transform.SetParent(TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform, false);
+                if (TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y] != null)
+                    biome.transform.SetParent(TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform, false);
+                else
+                    Destroy(biome);
 
                 switch (tile.GetTerrain().GetName())
                 {
@@ -165,7 +243,11 @@ public class MapManager : MonoBehaviour
                         terrain = Instantiate(rocks, worldPos + rocks.transform.position, Quaternion.identity);
                         break;
                 }
-                terrain.transform.SetParent(TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform, false);
+
+                if (TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y] != null)
+                    terrain.transform.SetParent(TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform, false);
+                else
+                    Destroy(terrain);
 
                 switch (tile.GetBuiltBuilding()?.GetBuild().GetBuildType())
                 {
@@ -260,7 +342,11 @@ public class MapManager : MonoBehaviour
                         building = Instantiate(nuclear_fusion_reactor, worldPos + nuclear_fusion_reactor.transform.position, Quaternion.identity);
                         break;
                 }
-                building.transform.SetParent(TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform, false);
+
+                if (TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y] != null)
+                    building.transform.SetParent(TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform, false);
+                else
+                    Destroy(building);
             }
         }
     }

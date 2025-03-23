@@ -21,4 +21,5 @@ public class Villager
     }
 
     public Vector2Int GetPosition() { return _position; }
+    public string GetId() { return _id; }
 }

@@ -15,4 +15,6 @@ public class Resource
         _description = description;
         this.type = type;
     }
+
+    public string GetName() { return _name; }
 }
