@@ -12,6 +12,8 @@ public class Tile
     private Owner _owner;
     private Dictionary<Resource, int> _resources = new Dictionary<Resource, int>();
 
+    public bool existe = false;
+
     public Tile (Vector2Int coordinates, BuildingProgress builtBuilding, bool accessible, Biome biome, Terrain terrain, Owner owner, Dictionary<Resource, int> resources)
     {
         _coordinates = coordinates;

@@ -89,6 +89,8 @@ public class RestAPI : MonoBehaviour
             request.uploadHandler = upHandler;
         }
 
+        Debug.Log(body);
+
         return request.SendWebRequest();
     }
 
@@ -160,6 +162,7 @@ public class RestAPI : MonoBehaviour
                             Biome b = new Biome(_biome["identifiant"], _biome["nom"], _biome["description"]);
                             _pBuildableOnList.Add(b);
                         }
+                        //Debug.Log(jsonBuilding["type"]);
                         Building _buildProgress = new Building(jsonBuilding["id"], jsonBuilding["description"], jsonBuilding["type"], jsonBuilding["tempsConstruction"],
                                 jsonBuilding["estUneMerveille"], _pBuildableOnList, Utility.ConstructResourceDict(jsonBuilding["coutParTour"]),
                                 Utility.ConstructResourceDict(jsonBuilding["coutConstruction"]), Utility.ConstructResourceDict(jsonBuilding["bonusConstruction"]),
@@ -168,13 +171,25 @@ public class RestAPI : MonoBehaviour
 
                         Owner buildingOwner = new Owner(jsonBuildingOwner["idEquipe"], jsonBuildingOwner["nom"], jsonBuildingOwner["type"]);
 
+                        //Debug.Log(_buildProgress.GetBuildType());
                         BuildingProgress building = new BuildingProgress(jsonBuild["progression"], jsonBuild["identifiant"], buildingOwner, _buildProgress);
 
 
+                        //Debug.LogWarning("B " + building.GetBuild().GetBuildType());
+                       // if(MapManager.Instance.Map[position.x, position.y] == null || !MapManager.Instance.Map[position.x, position.y].existe)
+                       // {
                         MapManager.Instance.Map[position.x, position.y] = new Tile(position, building, accessible, biome, terrain, owner, Utility.ConstructResourceDictNoID(jsonResources));
-                    }
 
-                    MapManager.Instance.Map[position.x, position.y] = new Tile(position, accessible, biome, terrain, owner, Utility.ConstructResourceDictNoID(jsonResources));
+                        //Debug.LogWarning("M " + MapManager.Instance.Map[position.x, position.y].GetBuiltBuilding().GetBuild().GetBuildType());
+                        //}
+                    }
+                    else
+                    {
+                        MapManager.Instance.Map[position.x, position.y] = new Tile(position, accessible, biome, terrain, owner, Utility.ConstructResourceDictNoID(jsonResources));
+                    }
+                    //if (MapManager.Instance.Map[position.x, position.y] == null || !MapManager.Instance.Map[position.x, position.y].existe)
+                    //else
+                    //    MapManager.Instance.Map[position.x, position.y] = MapManager.Instance.Map[position.x, position.y];
                 }
             }
             mapReady?.Invoke();
@@ -199,10 +214,11 @@ public class RestAPI : MonoBehaviour
             string json = request?.downloadHandler.text;
             JSONNode team = JSON.Parse(json);
 
+
             // REcuperation des données
             MapManager.Instance.activeResources = Utility.ConstructResourceDictNoID(team["ressources"]);
             uiUpdate.Invoke();
-
+            
             JSONNode jsonVillagers = team["villageois"];
             List<Villager> villagers = new List<Villager>();
 

@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Purchasing.MiniJSON;
 using UnityEngine.UIElements;
+using UnityEngine.XR;
 
 public class MapManager : MonoBehaviour
 {
@@ -84,7 +85,8 @@ public class MapManager : MonoBehaviour
 
     public List<Villager> Villagers;
     public Villager VillagerById;
-    public GameObject pointValue;
+    public float energy;
+    public float pollution;
 
     public Dictionary<Resource, int> activeResources = new Dictionary<Resource, int>();
 
@@ -130,15 +132,38 @@ public class MapManager : MonoBehaviour
                     {
                         foreach (Resource resource in resources.Keys)
                         {
-                            if (resources[resource] > 0)
+                            if (resources[resource] <= 250)
                             {
-                                    restAPI.CastActionAsync(villager.GetId(), "RECOLTER", resource.GetName());
-                                    postTimer = maxPostTimer;
+                                int rand = Random.Range(0, 4);
+                                Debug.Log(rand);
+                                switch (rand)
+                                {
+                                    case 0:
+                                        restAPI.CastActionAsync(villager.GetId(), "DEPLACEMENT_BAS");
+                                        break;
+                                    case 1:
+                                        restAPI.CastActionAsync(villager.GetId(), "DEPLACEMENT_DROITE");
+                                        break;
+                                    case 2:
+                                        restAPI.CastActionAsync(villager.GetId(), "DEPLACEMENT_HAUT");
+                                        break;
+                                    case 3:
+                                        restAPI.CastActionAsync(villager.GetId(), "DEPLACEMENT_GAUCHE");
+                                        break;
+                                }
+                            }
+                            else if (resources[resource] > 0)
+                            {
+                                restAPI.CastActionAsync(villager.GetId(), "RECOLTER", resource.GetName());
+                                StartCoroutine(restAPI.GetTeam());
                             }
                         }
+                        StartCoroutine(restAPI.GetMap(new Vector2Int(villager.GetPosition().x - 3, villager.GetPosition().x + 2),
+                            new Vector2Int(villager.GetPosition().y - 3, villager.GetPosition().y + 2)));
                     }
                 }
             }
+            postTimer = maxPostTimer;
         }
 
         if (getTimer <= 0)
@@ -154,7 +179,6 @@ public class MapManager : MonoBehaviour
     {
         foreach(Resource res in activeResources.Keys)
         {
-            Debug.Log(activeResources[res].ToString());
             switch(res.GetName())
             {
                 case "BOIS":
@@ -172,6 +196,12 @@ public class MapManager : MonoBehaviour
                 case "NOURRITURE":
                     foodValue.text = activeResources[res].ToString();
                     break;
+                case "ENERGIE":
+                    energieValue.text = activeResources[res].ToString();
+                    break;
+                case "POLLUTION":
+                    pollutionValue.text = activeResources[res].ToString();
+                    break;
             }
         }
 
@@ -181,8 +211,11 @@ public class MapManager : MonoBehaviour
     {
         foreach(Tile tile in Map)
         {
+            //Debug.LogWarning("TILE " + tile?.GetBuiltBuilding());
+
             if(tile != null)
             {
+                tile.existe = true;
                 Vector2Int pos = tile.GetCoordinates() * 7;
                 Vector3 worldPos = new Vector3(pos.x, 0, pos.y);
                 if(TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y] == null)
@@ -193,160 +226,178 @@ public class MapManager : MonoBehaviour
                 GameObject terrain = new GameObject("Terrain");
                 GameObject building = new GameObject("Batiment");
 
-                switch (tile.GetBiome().GetName())
+                Transform currentBiome = TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform.Find("Biome");
+                Transform currentTerrain = TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform.Find("Terrain");
+                Transform currentBuilding = TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform.Find("Batiment");
+
+                if (currentBiome != null)
                 {
-                    case "Plaine":
-                        biome = Instantiate(tilePlain, worldPos + tilePlain.transform.position, Quaternion.identity);
-                        break;
-                    case "Lac":
-                        biome = Instantiate(tileLake, worldPos + tileLake.transform.position, Quaternion.identity);
-                        break;
-                    case "Désert":
-                        biome = Instantiate(tileDesert, worldPos + tileDesert.transform.position, Quaternion.identity);
-                        break;
+                    switch (tile.GetBiome().GetName())
+                    {
+                        case "Plaine":
+                            biome = Instantiate(tilePlain, worldPos + tilePlain.transform.position, Quaternion.identity);
+                            break;
+                        case "Lac":
+                            biome = Instantiate(tileLake, worldPos + tileLake.transform.position, Quaternion.identity);
+                            break;
+                        case "Désert":
+                            biome = Instantiate(tileDesert, worldPos + tileDesert.transform.position, Quaternion.identity);
+                            break;
+                    }
                 }
+
+                if (currentTerrain != null)
+                {
+                    switch (tile.GetTerrain().GetName())
+                    {
+                        case "Bosquet":
+                            terrain = Instantiate(grove, worldPos + grove.transform.position, Quaternion.identity);
+                            break;
+                        case "Desert_bosquet":
+                            terrain = Instantiate(desertGrove, worldPos + desertGrove.transform.position, Quaternion.identity);
+                            break;
+                        case "Desert_foret":
+                            terrain = Instantiate(desertForest, worldPos + desertForest.transform.position, Quaternion.identity);
+                            break;
+                        case "Desert_petit_bois_et_amas_rocheux":
+                            terrain = Instantiate(desertLittleWood, worldPos + desertLittleWood.transform.position, Quaternion.identity);
+                            break;
+                        case "Foret":
+                            terrain = Instantiate(forest, worldPos + forest.transform.position, Quaternion.identity);
+                            break;
+                        case "Gisement_de_charbon":
+                            terrain = Instantiate(coalDeposit, worldPos + coalDeposit.transform.position, Quaternion.identity);
+                            break;
+                        case "Gisement_de_minerais":
+                            terrain = Instantiate(oreDeposit, worldPos + oreDeposit.transform.position, Quaternion.identity);
+                            break;
+                        case "Petit_bois_et_amas_rocheux":
+                            terrain = Instantiate(littleWood, worldPos + littleWood.transform.position, Quaternion.identity);
+                            break;
+                        case "Poisson":
+                            terrain = Instantiate(fish, worldPos + fish.transform.position, Quaternion.identity);
+                            break;
+                        case "Rochers":
+                            terrain = Instantiate(rocks, worldPos + rocks.transform.position, Quaternion.identity);
+                            break;
+                    }
+
+                }
+
+
+
+                if (currentBuilding != null)
+                {
+                    Destroy(currentBuilding.gameObject);
+                    switch (tile.GetBuiltBuilding()?.GetBuild().GetBuildType())
+                    {
+                        case "CABANE_DE_BUCHERON":
+                            Debug.LogWarning("Cabane de buche");
+                            Instantiate(logging_hut, worldPos + logging_hut.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "SCIERIE":
+                            Instantiate(sawMill, worldPos + sawMill.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "ATELIER_DE_TAILLE_DE_PIERRE":
+                            Instantiate(stone_cutting_workshop, worldPos + stone_cutting_workshop.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "CARRIERE":
+                            Instantiate(quarry, worldPos + quarry.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "EXCAVATRICE_A_FER":
+                            Instantiate(iron_excavator, worldPos + iron_excavator.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "MINE_DE_FER":
+                            Instantiate(iron_mining, worldPos + iron_mining.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "ATELIER_DE_CHARBONNIER":
+                            Instantiate(coal_mining_workshop, worldPos + coal_mining_workshop.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "MINE_DE_CHARBON":
+                            Instantiate(coal_mining, worldPos + coal_mining.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "MOULIN":
+                            Instantiate(mill, worldPos + mill.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "FERME":
+                            Instantiate(farm, worldPos + farm.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "PORT":
+                            Instantiate(port, worldPos + port.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "EOLIENNE":
+                            Instantiate(windMill, worldPos + windMill.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "CENTRALE_ELECTRIQUE_AU_CHARBON":
+                            Instantiate(coal_power_plant, worldPos + coal_power_plant.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "CENTRALE_AU_METHANE":
+                            Instantiate(methane_power_plant, worldPos + methane_power_plant.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "CENTRALE_A_BIOMASSE":
+                            Instantiate(biomass_plant, worldPos + biomass_plant.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "TURBINE_HYDRAULIQUE":
+                            Instantiate(hydro_turbine, worldPos + hydro_turbine.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "INSTALLATION_FORESTIERE":
+                            Instantiate(forest_plant, worldPos + forest_plant.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "USINE_DE_RENOUVELLEMENT":
+                            Instantiate(renewal_plant, worldPos + renewal_plant.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "PUITS_DE_CARBONE":
+                            Instantiate(carbon_well, worldPos + carbon_well.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "TOUR_DE_GUET":
+                            Instantiate(guet_tower, worldPos + guet_tower.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "OBSERVATOIRE":
+                            Instantiate(observatory, worldPos + observatory.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "MUSEE":
+                            Instantiate(museum, worldPos + museum.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "BIBLIOTHEQUE":
+                            Instantiate(library, worldPos + library.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "THEATRE":
+                            Instantiate(theater, worldPos + theater.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "GRANDE_STATUE":
+                            Instantiate(high_statue, worldPos + high_statue.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "CAPITOLE":
+                            Instantiate(capitol, worldPos + capitol.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "BATEAU_DE_CROISIERE":
+                            Instantiate(ship, worldPos + ship.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "GRANDE_BIBLIOTHEQUE":
+                            Instantiate(high_library, worldPos + high_library.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "CHATEAU":
+                            Instantiate(castle, worldPos + castle.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                        case "REACTEUR_A_FUSION_NUCLEAIRE ":
+                            Instantiate(nuclear_fusion_reactor, worldPos + nuclear_fusion_reactor.transform.position, Quaternion.identity).transform.SetParent(building.transform, false);
+                            break;
+                    }
+                }
+
+
                 if (TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y] != null)
+                {
                     biome.transform.SetParent(TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform, false);
-                else
-                    Destroy(biome);
-
-                switch (tile.GetTerrain().GetName())
-                {
-                    case "Bosquet":
-                        terrain = Instantiate(grove, worldPos + grove.transform.position, Quaternion.identity);
-                        break;
-                    case "Desert_bosquet":
-                        terrain = Instantiate(desertGrove, worldPos + desertGrove.transform.position, Quaternion.identity);
-                        break;
-                    case "Desert_foret":
-                        terrain = Instantiate(desertForest, worldPos + desertForest.transform.position, Quaternion.identity);
-                        break;
-                    case "Desert_petit_bois_et_amas_rocheux":
-                        terrain = Instantiate(desertLittleWood, worldPos + desertLittleWood.transform.position, Quaternion.identity);
-                        break;
-                    case "Foret":
-                        terrain = Instantiate(forest, worldPos + forest.transform.position, Quaternion.identity);
-                        break;
-                    case "Gisement_de_charbon":
-                        terrain = Instantiate(coalDeposit, worldPos + coalDeposit.transform.position, Quaternion.identity);
-                        break;
-                    case "Gisement_de_minerais":
-                        terrain = Instantiate(oreDeposit, worldPos + oreDeposit.transform.position, Quaternion.identity);
-                        break;
-                    case "Petit_bois_et_amas_rocheux":
-                        terrain = Instantiate(littleWood, worldPos + littleWood.transform.position, Quaternion.identity);
-                        break;
-                    case "Poisson":
-                        terrain = Instantiate(fish, worldPos + fish.transform.position, Quaternion.identity);
-                        break;
-                    case "Rochers":
-                        terrain = Instantiate(rocks, worldPos + rocks.transform.position, Quaternion.identity);
-                        break;
-                }
-
-                if (TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y] != null)
                     terrain.transform.SetParent(TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform, false);
-                else
-                    Destroy(terrain);
-
-                switch (tile.GetBuiltBuilding()?.GetBuild().GetBuildType())
-                {
-                    case "CABANE_DE_BUCHERON":
-                        building = Instantiate(logging_hut, worldPos + logging_hut.transform.position, Quaternion.identity);
-                        break;
-                    case "SCIERIE":
-                        building = Instantiate(sawMill, worldPos + sawMill.transform.position, Quaternion.identity);
-                        break;
-                    case "ATELIER_DE_TAILLE_DE_PIERRE":
-                        building = Instantiate(stone_cutting_workshop, worldPos + stone_cutting_workshop.transform.position, Quaternion.identity);
-                        break;
-                    case "CARRIERE":
-                        building = Instantiate(quarry, worldPos + quarry.transform.position, Quaternion.identity);
-                        break;
-                    case "EXCAVATRICE_A_FER":
-                        building = Instantiate(iron_excavator, worldPos + iron_excavator.transform.position, Quaternion.identity);
-                        break;
-                    case "MINE_DE_FER":
-                        building = Instantiate(iron_mining, worldPos + iron_mining.transform.position, Quaternion.identity);
-                        break;
-                    case "ATELIER_DE_CHARBONNIER":
-                        building = Instantiate(coal_mining_workshop, worldPos + coal_mining_workshop.transform.position, Quaternion.identity);
-                        break;
-                    case "MINE_DE_CHARBON":
-                        building = Instantiate(coal_mining, worldPos + coal_mining.transform.position, Quaternion.identity);
-                        break;
-                    case "MOULIN":
-                        building = Instantiate(mill, worldPos + mill.transform.position, Quaternion.identity);
-                        break;
-                    case "FERME":
-                        building = Instantiate(farm, worldPos + farm.transform.position, Quaternion.identity);
-                        break;
-                    case "PORT":
-                        building = Instantiate(port, worldPos + port.transform.position, Quaternion.identity);
-                        break;
-                    case "EOLIENNE":
-                        building = Instantiate(windMill, worldPos + windMill.transform.position, Quaternion.identity);
-                        break;
-                    case "CENTRALE_ELECTRIQUE_AU_CHARBON":
-                        building = Instantiate(coal_power_plant, worldPos + coal_power_plant.transform.position, Quaternion.identity);
-                        break;
-                    case "CENTRALE_AU_METHANE":
-                        building = Instantiate(methane_power_plant, worldPos + methane_power_plant.transform.position, Quaternion.identity);
-                        break;
-                    case "CENTRALE_A_BIOMASSE":
-                        building = Instantiate(biomass_plant, worldPos + biomass_plant.transform.position, Quaternion.identity);
-                        break;
-                    case "TURBINE_HYDRAULIQUE":
-                        building = Instantiate(hydro_turbine, worldPos + hydro_turbine.transform.position, Quaternion.identity);
-                        break;
-                    case "INSTALLATION_FORESTIERE":
-                        building = Instantiate(forest_plant, worldPos + forest_plant.transform.position, Quaternion.identity);
-                        break;
-                    case "USINE_DE_RENOUVELLEMENT":
-                        building = Instantiate(renewal_plant, worldPos + renewal_plant.transform.position, Quaternion.identity);
-                        break;
-                    case "PUITS_DE_CARBONE":
-                        building = Instantiate(carbon_well, worldPos + carbon_well.transform.position, Quaternion.identity);
-                        break;
-                    case "TOUR_DE_GUET":
-                        building = Instantiate(guet_tower, worldPos + guet_tower.transform.position, Quaternion.identity);
-                        break;
-                    case "OBSERVATOIRE":
-                        building = Instantiate(observatory, worldPos + observatory.transform.position, Quaternion.identity);
-                        break;
-                    case "MUSEE":
-                        building = Instantiate(museum, worldPos + museum.transform.position, Quaternion.identity);
-                        break;
-                    case "BIBLIOTHEQUE":
-                        building = Instantiate(library, worldPos + library.transform.position, Quaternion.identity);
-                        break;
-                    case "THEATRE":
-                        building = Instantiate(theater, worldPos + theater.transform.position, Quaternion.identity);
-                        break;
-                    case "GRANDE_STATUE":
-                        building = Instantiate(high_statue, worldPos + high_statue.transform.position, Quaternion.identity);
-                        break;
-                    case "CAPITOLE":
-                        building = Instantiate(capitol, worldPos + capitol.transform.position, Quaternion.identity);
-                        break;
-                    case "BATEAU_DE_CROISIERE":
-                        building = Instantiate(ship, worldPos + ship.transform.position, Quaternion.identity);
-                        break;
-                    case "GRANDE_BIBLIOTHEQUE":
-                        building = Instantiate(high_library, worldPos + high_library.transform.position, Quaternion.identity);
-                        break;
-                    case "CHATEAU":
-                        building = Instantiate(castle, worldPos + castle.transform.position, Quaternion.identity);
-                        break;
-                    case "REACTEUR_A_FUSION_NUCLEAIRE ":
-                        building = Instantiate(nuclear_fusion_reactor, worldPos + nuclear_fusion_reactor.transform.position, Quaternion.identity);
-                        break;
-                }
-
-                if (TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y] != null)
                     building.transform.SetParent(TileMap[tile.GetCoordinates().x, tile.GetCoordinates().y].transform, false);
+                }
                 else
+                {
+                    Destroy(biome);
+                    Destroy(terrain);
                     Destroy(building);
+                }
             }
         }
     }
@@ -369,6 +420,53 @@ public class MapManager : MonoBehaviour
             }
         }
 
+    }
+
+
+    public void CreateLoggingHut()
+    {
+        foreach(Villager villager in Villagers)
+        {
+            if (Map[villager.GetPosition().x, villager.GetPosition().y].IsAccessible())
+            {
+                //Construire
+                UnityWebRequestAsyncOperation req = restAPI.CastActionAsync(villager.GetId(), "CONSTRUIRE", "CABANE_DE_BUCHERON");
+                if(req.isDone)
+                    StartCoroutine(restAPI.GetMap(new Vector2Int(villager.GetPosition().x - 3, villager.GetPosition().x + 2),
+                    new Vector2Int(villager.GetPosition().y - 3, villager.GetPosition().y + 2)));
+                return;
+            }
+        }
+    }
+
+    public void CreateStoneCuttingWorkshop()
+    {
+        foreach (Villager villager in Villagers)
+        {
+            if (Map[villager.GetPosition().x, villager.GetPosition().y].IsAccessible())
+            {
+                //Construire
+                restAPI.CastActionAsync(villager.GetId(), "COMMENCER_CONSTRUCTION", "ATELIER_DE_TAILLE_DE_PIERRE");
+                StartCoroutine(restAPI.GetMap(new Vector2Int(villager.GetPosition().x - 3, villager.GetPosition().x + 2),
+                    new Vector2Int(villager.GetPosition().y - 3, villager.GetPosition().y + 2)));
+                return;
+            }
+        }
+    }
+
+    public void CreateCoalMiningWorkshop()
+    {
+        foreach (Villager villager in Villagers)
+        {
+            if (Map[villager.GetPosition().x, villager.GetPosition().y].IsAccessible())
+            {
+                //Construire
+                restAPI.CastActionAsync(villager.GetId(), "COMMENCER_CONSTRUCTION", "ATELIER_DE_CHARBONNIER");
+                StartCoroutine(restAPI.GetMap(new Vector2Int(villager.GetPosition().x - 3, villager.GetPosition().x + 2),
+                    new Vector2Int(villager.GetPosition().y - 3, villager.GetPosition().y + 2)));
+                return;
+            }
+        }
     }
 
 }

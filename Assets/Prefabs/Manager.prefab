@@ -90,7 +90,19 @@ MonoBehaviour:
   renewal_plant: {fileID: 6732004053705294651, guid: 1daa9de63bfbbc347b921d204b29a221, type: 3}
   build_zone: {fileID: 664050058215857334, guid: 650e62480804c0146801bc7f846ecfa5, type: 3}
   villagerPrefab: {fileID: 3986253116154727268, guid: 153fbb7bacb0d174c814f6018699f383, type: 3}
+  woodValue: {fileID: 0}
+  coalValue: {fileID: 0}
+  ironValue: {fileID: 0}
+  foodValue: {fileID: 0}
+  rockValue: {fileID: 0}
+  pollutionValue: {fileID: 0}
+  energieValue: {fileID: 0}
   MapObject: {fileID: 0}
+  maxPostTimer: 6
+  maxGetTimer: 6
+  getTimer: 0
+  energy: 0
+  pollution: 0
 --- !u!114 &7733444793316955227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,6 +121,36 @@ MonoBehaviour:
       - m_Target: {fileID: 379848137916926297}
         m_TargetAssemblyTypeName: MapManager, Assembly-CSharp
         m_MethodName: GenerateMap
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  npcReady:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 379848137916926297}
+        m_TargetAssemblyTypeName: MapManager, Assembly-CSharp
+        m_MethodName: DisplayVillagers
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  uiUpdate:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 379848137916926297}
+        m_TargetAssemblyTypeName: MapManager, Assembly-CSharp
+        m_MethodName: UpdateUI
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
